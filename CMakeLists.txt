@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.10)
-project(Begin_OpenGl)
+cmake_minimum_required(VERSION 3.31)
+project(Begin_OpenGl) 
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
