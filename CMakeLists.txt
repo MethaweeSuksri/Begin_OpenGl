@@ -1,24 +1,30 @@
 cmake_minimum_required(VERSION 3.31)
-project(Begin_OpenGl) 
+project(Begin_OpenGL)
 
-# Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Include GLFW headers
-include_directories(${CMAKE_SOURCE_DIR}/GLFW)
+# Source files
+set(SOURCES
+    src/main.cpp
+    src/glad.c
+)
 
-# Add executable
-add_executable(MyApp main.cpp)
+# Executable
+add_executable(MyApp ${SOURCES})
 
-# Link GLFW and OpenGL
-target_link_libraries(MyApp
-    ${CMAKE_SOURCE_DIR}/libglfw3.a
+# Include directories
+target_include_directories(MyApp PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+)
+
+# Link libraries
+target_link_libraries(MyApp PRIVATE
+    ${PROJECT_SOURCE_DIR}/lib/libglfw3.a
     GL
-    X11
-    pthread
-    Xrandr
-    Xi
-    dl
-    m
+)
+
+# Optional: Set output directory for executable
+set_target_properties(MyApp PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
 )
