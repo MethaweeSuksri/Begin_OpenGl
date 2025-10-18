@@ -11,20 +11,27 @@ set(SOURCES
 )
 
 # Executable
-add_executable(MyApp ${SOURCES})
+add_executable(Begin_OpenGL ${SOURCES})
 
 # Include directories
-target_include_directories(MyApp PRIVATE
+target_include_directories(Begin_OpenGL PRIVATE
     ${PROJECT_SOURCE_DIR}/include
 )
 
 # Link libraries
-target_link_libraries(MyApp PRIVATE
-    ${PROJECT_SOURCE_DIR}/lib/libglfw3.a
+target_link_libraries(Begin_OpenGL PRIVATE
+    ${PROJECT_SOURCE_DIR}/lib/libglfw.so
     GL
+
+    X11
+    pthread
+    Xrandr
+    Xi
+    dl
+    m
 )
 
 # Optional: Set output directory for executable
-set_target_properties(MyApp PROPERTIES
+set_target_properties(Begin_OpenGL PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/build
 )
