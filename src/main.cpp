@@ -158,7 +158,8 @@ int main()
     glDeleteShader(fragmentShader); 
 
     //-----------------------------------------------------------------------------------------------------------------
-    
+    // uncomment this call to draw in wireframe polygons.
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     //-----------------------------------------------------------------------------------------------------------------
     // render loop
