@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+
 // tell opengl about the render size everythime that user resize the window
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 {
@@ -10,7 +11,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
 
 void processInput(GLFWwindow *window)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }
 
@@ -43,10 +44,32 @@ int main()
     // this function call use the resize callback fucntion to readjust the viewport to fit the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    //render loop
+    //-----------------------------------------------------------------------------------------------------------------
+    //  send vertices data to gpu
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f};
+
+    // Buffer generation
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    
+    //buffer binding (bind VBO to GL_ARRAY_BUFFER) 
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);  
+
+    //allocate the buffer to VRAM
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    //-----------------------------------------------------------------------------------------------------------------
+    // render loop
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
+
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
