@@ -78,23 +78,12 @@ int main()
     
     // 2. vertex preparation
 
-    //  send vertices data to gpu
+    //  define vertices 
     float vertices[] = {
     -0.5f, -0.5f, 0.0f,
      0.5f, -0.5f, 0.0f,
      0.0f,  0.5f, 0.0f
     };  
-
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 2,   // first triangle
-    }; 
-
-    //  create element buffer object for specifying the order of drawing multiple triangle
-    unsigned int EBO;
-    glGenBuffers(1, &EBO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
 
     // Buffer generation, vertex array generation
     unsigned int VBO,VAO;
@@ -113,6 +102,22 @@ int main()
     // specified how OpenGL should interpret the vertex data 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);  
+
+
+    //EBO
+
+    unsigned int indices[] = {  // note that we start from 0!
+        0, 1, 2,   // first triangle
+    }; 
+
+    //  create element buffer object for specifying the order of drawing multiple triangle
+    unsigned int EBO;
+    glGenBuffers(1, &EBO);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW); 
+
+
 
     //-----------------------------------------------------------------------------------------------------------------
     
