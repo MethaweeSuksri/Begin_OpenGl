@@ -2,21 +2,25 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
+#include <shader.h>
 
 // vertex shader objst
 const char *vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
+                                 "layout (location = 0) in vec3 aPos;\n"    // the position variable has attribute position 0
+                                 "layout (location = 1) in vec3 aColor;\n"  // the color variable has attribute position 1
+                                 "out vec3 ourColor;"                       // output a color to the fragment shader
                                  "void main()\n"
                                  "{\n"
                                  "   gl_Position = vec4(aPos, 1.0);\n"
+                                 "   ourColor = aColor;\n"                  // set ourColor to the input color we got from the vertex data
                                  "}\0";
 
 const char *fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
-                                   "uniform vec4 ourColor;\n"
+                                   "in vec3 ourColor;\n"
                                    "void main()\n"
                                    "{\n"
-                                   "   FragColor = ourColor;\n"
+                                   "   FragColor = vec4(ourColor, 1.0);\n"
                                    "}\n\0";
 
 // tell opengl about the render size everythime that user resize the window
@@ -80,10 +84,11 @@ int main()
 
     //  define vertices 
     float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-    };  
+        // positions         // colors
+        0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+        0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+    };    
 
     // Buffer generation, vertex array generation
     unsigned int VBO,VAO;
@@ -100,8 +105,12 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // specified how OpenGL should interpret the vertex data 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);  
+
+    // specify color attribute vertex array pointer
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);  
 
 
     //EBO
@@ -197,11 +206,7 @@ int main()
         //activate shader program
         glUseProgram(shaderProgram);
 
-        // update the uniform color
-        float timeValue = glfwGetTime();
-        float greenValue = sin(timeValue) / 2.0f + 0.5f;
-        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        
 
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);

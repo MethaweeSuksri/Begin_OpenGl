@@ -22,7 +22,6 @@ target_include_directories(Begin_OpenGL PRIVATE
 target_link_libraries(Begin_OpenGL PRIVATE
     ${PROJECT_SOURCE_DIR}/lib/libglfw.so
     GL
-
     X11
     pthread
     Xrandr
