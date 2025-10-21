@@ -2,6 +2,8 @@ This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ 
 
 ## Todos 
     -   use glfw as submodule
+    -   learn cpp template
+    -   
 
 ## Development Diary
 
@@ -10,3 +12,6 @@ This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ 
   currently learning Cmake overall (
     GOAL: to be able to simply using cmake to properly link all dependencies,
   )
+
+21/10/2025
+  gosh i need to learn more about cpp. now i have template, fstream, sstream and import management to learn
