@@ -3,7 +3,7 @@ This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ 
 ## Todos 
     -   use glfw as submodule
     -   learn cpp template
-    -   
+    -   fstream, sstream
 
 ## Development Diary
 
@@ -15,3 +15,6 @@ This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ 
 
 21/10/2025
   gosh i need to learn more about cpp. now i have template, fstream, sstream and import management to learn
+
+23/10/2025
+  currently learning cpp with cherno's video about class and template
