@@ -5,7 +5,7 @@
 #include <shader.h>
 
 // vertex shader objst
-const char *vertexShaderSource = "#version 330 core\n"
+const char *vertexShaderSource = "#version 460 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"    // the position variable has attribute position 0
                                  "layout (location = 1) in vec3 aColor;\n"  // the color variable has attribute position 1
                                  "out vec3 ourColor;"                       // output a color to the fragment shader
@@ -15,7 +15,7 @@ const char *vertexShaderSource = "#version 330 core\n"
                                  "   ourColor = aColor;\n"                  // set ourColor to the input color we got from the vertex data
                                  "}\0";
 
-const char *fragmentShaderSource = "#version 330 core\n"
+const char *fragmentShaderSource = "#version 460 core\n"
                                    "out vec4 FragColor;\n"
                                    "in vec3 ourColor;\n"
                                    "void main()\n"
@@ -49,8 +49,8 @@ int main()
 
     // initialize glfw
     glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // this is required for mac
 
