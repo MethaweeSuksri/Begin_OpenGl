@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <cmath>
-#include <shader.h>
+#include "shader.h"
 
 // vertex shader objst
 const char *vertexShaderSource = "#version 460 core\n"
@@ -54,8 +54,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // this is required for mac
 
-    int success;
-    char infoLog[512];
+    
 
     // ***!!!create window object!!!***
     GLFWwindow *window = glfwCreateWindow(800, 600, "Begin_OpenGl", NULL, NULL);
@@ -131,60 +130,7 @@ int main()
     //-----------------------------------------------------------------------------------------------------------------
     
     // 3. set up shader    
-
-    //  create vertex shader
-    unsigned int vertexShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-    // link vertexShader code to shader object
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-        // shader compile error check
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if(!success)
-            {
-                glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-                std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-            }
-
-    // create fragment shader
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // link fragmentShader code to shader object
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-        // shader compile error check
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if(!success)
-            {
-                glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-                std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-            }
-
-    // create shader program object (basically pipelining)
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-
-    // attach shader together
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-        // check shader linking error
-        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-        if(!success) {
-            glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-        }
-
-    
-
-    // after linking wee dont need these anymore
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader); 
+    Shader theShader("src/shaders/shader.vs","src/shaders/shader.fs");
 
     //-----------------------------------------------------------------------------------------------------------------
     // uncomment this call to draw in wireframe polygons.
@@ -204,7 +150,9 @@ int main()
 
 
         //activate shader program
-        glUseProgram(shaderProgram);
+        theShader.use();
+        theShader.setFloat("someUniform", 1.0f);
+
 
         
 

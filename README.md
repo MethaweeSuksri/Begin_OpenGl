@@ -2,7 +2,6 @@ This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ 
 
 ## Todos 
     -   use glfw as submodule
-    -   learn cpp template
     -   fstream, sstream
 
 ## Development Diary
@@ -18,3 +17,6 @@ This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ 
 
 23/10/2025
   currently learning cpp with cherno's video about class and template
+
+28/10/2025
+  seems like i can't quite understand how to read file in c++. So I;m currently using direct path to shader files
