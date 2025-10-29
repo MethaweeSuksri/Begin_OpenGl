@@ -4,24 +4,6 @@
 #include <cmath>
 #include "shader.h"
 
-// vertex shader objst
-const char *vertexShaderSource = "#version 460 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"    // the position variable has attribute position 0
-                                 "layout (location = 1) in vec3 aColor;\n"  // the color variable has attribute position 1
-                                 "out vec3 ourColor;"                       // output a color to the fragment shader
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = vec4(aPos, 1.0);\n"
-                                 "   ourColor = aColor;\n"                  // set ourColor to the input color we got from the vertex data
-                                 "}\0";
-
-const char *fragmentShaderSource = "#version 460 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "in vec3 ourColor;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = vec4(ourColor, 1.0);\n"
-                                   "}\n\0";
 
 // tell opengl about the render size everythime that user resize the window
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
@@ -84,9 +66,9 @@ int main()
     //  define vertices 
     float vertices[] = {
         // positions         // colors
-        0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-        0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
+        1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+        -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+        0.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
     };    
 
     // Buffer generation, vertex array generation
