@@ -9,6 +9,7 @@ set(SOURCES
     src/main.cpp
     src/shader.cpp
     src/glad.c
+    src/stb_image.cpp
 )
 
 # Executable

@@ -3,6 +3,9 @@
 #include <iostream>
 #include <cmath>
 #include "shader.h"
+#include <thread>
+#include <stb_image.h>
+
 
 
 // tell opengl about the render size everythime that user resize the window
@@ -22,7 +25,8 @@ void processInput(GLFWwindow *window)
     1. set up window
     2. vertex preparation
     3. set up shader
-    4. render loop
+    4. import texture
+    5. render loop
 */
 
 int main()
@@ -64,12 +68,13 @@ int main()
     // 2. vertex preparation
 
     //  define vertices 
-    float vertices[] = {
-        // positions         // colors
-        1.0f, -1.0f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-        -1.0f, -1.0f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-        0.0f,  1.0f, 0.0f,  0.0f, 0.0f, 1.0f    // top 
-    };    
+    constexpr float vertices[] = {
+    // positions          // colors           // texture coords
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+};
 
     // Buffer generation, vertex array generation
     unsigned int VBO,VAO;
@@ -86,11 +91,11 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // specified how OpenGL should interpret the vertex data 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);  
 
     // specify color attribute vertex array pointer
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);  
 
 
@@ -98,6 +103,7 @@ int main()
 
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 2,   // first triangle
+        0, 2, 3,   // first triangle
     }; 
 
     //  create element buffer object for specifying the order of drawing multiple triangle
@@ -118,9 +124,37 @@ int main()
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
+    // 4. import texture
+
+    //create and bind gl texture
+    unsigned int texture;
+    glGenTextures(1, &texture); 
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    //import the image data
+    int containerWidth, containerHeight, nrChannels;
+    unsigned char *data = stbi_load("textures/container.jpg", &containerWidth, &containerHeight, &nrChannels, 0); 
+
+    if(data)
+    {
+        //generate texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, containerWidth, containerHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture\n";
+    }
+
+    //texture VAO
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);  
+
+    //we're done generating the texture so we'll delete the data (unsign char "container") 
+    stbi_image_free(data);
     //-----------------------------------------------------------------------------------------------------------------
     
-    // 4. render loop
+    // 5. render loop
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -130,17 +164,15 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+         // bind Texture
+        glBindTexture(GL_TEXTURE_2D, texture);
 
         //activate shader program
         theShader.use();
-        theShader.setFloat("someUniform", 1.0f);
-
-
-        
-
         glBindVertexArray(VAO);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        
+        
         
         glfwSwapBuffers(window);
         glfwPollEvents();
