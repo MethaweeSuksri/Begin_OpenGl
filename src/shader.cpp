@@ -1,5 +1,7 @@
 #include "shader.h"
 
+
+
 //shader constructor
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 { 
