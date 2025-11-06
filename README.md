@@ -1,8 +1,12 @@
 This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ development lol)
 
+## Goal 
+dude let's remake my cg project
+
+
 ## Todos 
     -   use glfw as submodule
-    -   fstream, sstream
+
 
 ## Development Diary
 

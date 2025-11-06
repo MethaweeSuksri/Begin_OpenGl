@@ -100,7 +100,6 @@ int main()
 
 
     //EBO
-
     unsigned int indices[] = {  // note that we start from 0!
         0, 1, 2,   // first triangle
         0, 2, 3,   // first triangle
@@ -178,6 +177,12 @@ int main()
         glfwPollEvents();
     }
 
+    // optional: de-allocate all resources once they've outlived their purpose:
+    // ------------------------------------------------------------------------
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+    glDeleteBuffers(1, &EBO);
+    
     // clear all allocated resource
     glfwTerminate();
 
