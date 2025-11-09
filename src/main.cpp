@@ -1,11 +1,3 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <iostream>
-#include <cmath>
-#include "shader.h"
-#include <thread>
-#include <stb_image.h>
-#include "glm/glm.hpp"
 #include "main.h"
 
 
