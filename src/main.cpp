@@ -52,6 +52,7 @@ int main()
     
     // 3. set up shader    
     Shader theShader("src/shaders/shader.vs","src/shaders/shader.fs");
+    
 
     //-----------------------------------------------------------------------------------------------------------------
     // uncomment this call to draw in wireframe polygons.
@@ -60,8 +61,8 @@ int main()
     // 4. import texture
 
     //create and bind gl texture
-    unsigned int texture;
-    loadTexture(texture);
+    unsigned int texture1, texture2;
+    loadTexture(texture1,texture2);
     
     //-----------------------------------------------------------------------------------------------------------------
     
@@ -75,11 +76,18 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-         // bind Texture
-        glBindTexture(GL_TEXTURE_2D, texture);
+        // bind textures on corresponding texture units
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+
 
         //activate shader program
         theShader.use();
+        glUniform1i(glGetUniformLocation(theShader.ID, "texture1"), 0);
+        glUniform1i(glGetUniformLocation(theShader.ID, "texture2"), 1);
+        
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
@@ -137,6 +145,7 @@ GLFWwindow*  glfwWindowSetup()
     return window;
 }
 
+// 2.
 void loadBuffer( const float vertices[], size_t vertices_size , const unsigned int indices[], size_t indices_size , unsigned int& VBO, unsigned int& VAO, unsigned int& EBO)
 {
     glGenBuffers(1, &VBO);
@@ -166,17 +175,28 @@ void loadBuffer( const float vertices[], size_t vertices_size , const unsigned i
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW); 
 
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+glEnableVertexAttribArray(2);
+
 };
 
-void loadTexture(unsigned int& texture)
+// 3.
+void loadTexture(unsigned int& texture1,unsigned int& texture2)
 {
-    glGenTextures(1, &texture); 
-    glBindTexture(GL_TEXTURE_2D, texture);
+
+    //for barrel
+    glGenTextures(1, &texture1); 
+    glBindTexture(GL_TEXTURE_2D, texture1);
+     // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     //import the image data
     int containerWidth, containerHeight, nrChannels;
     unsigned char *data = stbi_load("textures/container.jpg", &containerWidth, &containerHeight, &nrChannels, 0); 
-
     if(data)
     {
         //generate texture
@@ -187,10 +207,34 @@ void loadTexture(unsigned int& texture)
     {
         std::cout << "Failed to load texture\n";
     }
+    stbi_image_free(data);
 
-    //texture VAO
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);  
+    // for smiley
+
+    glGenTextures(1, &texture2); 
+    glBindTexture(GL_TEXTURE_2D, texture2);
+     // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    //import the image data
+    stbi_set_flip_vertically_on_load(true);
+    data = stbi_load("textures/awesomeface.png", &containerWidth, &containerHeight, &nrChannels, 0);
+    if(data)
+    {
+        //generate texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, containerWidth, containerHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture\n";
+    }
+    
+
 
     //we're done generating the texture so we'll delete the data (unsign char "container") 
     stbi_image_free(data);

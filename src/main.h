@@ -12,7 +12,7 @@ void loadBuffer(const float[], size_t,
                 const unsigned int[], size_t, 
                 unsigned int&, unsigned int&, unsigned int&);
 
-void loadTexture(unsigned int&);
+void loadTexture(unsigned int&,unsigned int&);
 
 void framebuffer_size_callback(GLFWwindow *, int , int );
 void processInput(GLFWwindow *window);
