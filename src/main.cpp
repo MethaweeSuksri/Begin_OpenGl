@@ -82,9 +82,18 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
+        
+glm::mat4 trans = glm::mat4(1.0f);
+trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
 
         //activate shader program
         theShader.use();
+
+
+        unsigned int transformLoc = glGetUniformLocation(theShader.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         glUniform1i(glGetUniformLocation(theShader.ID, "texture1"), 0);
         glUniform1i(glGetUniformLocation(theShader.ID, "texture2"), 1);
         
@@ -102,6 +111,8 @@ int main()
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+
+    
     
     // clear all allocated resource
     glfwTerminate();
