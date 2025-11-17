@@ -1,5 +1,9 @@
 #include "main.h"
 
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
 /*
     1. set up window
     2. vertex preparation
@@ -24,37 +28,82 @@ int main()
 
     //-----------------------------------------------------------------------------------------------------------------
 
+    Shader theShader("src/shaders/shader.vs", "src/shaders/shader.fs");
+
+    //-----------------------------------------------------------------------------------------------------------------
+
     // 2. vertex preparation
 
     //  define vertices
     constexpr float vertices[] = {
-        // positions          // colors           // texture coords
-        0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,   // top right
-        0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f   // top left
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    // EBO
-    unsigned int indices[] = {
-        // note that we start from 0!
-        0,
-        1,
-        2, // first triangle
-        0,
-        2,
-        3, // first triangle
-    };
 
     // Buffer generation, vertex array generation
-    unsigned int VBO, VAO, EBO;
+    unsigned int VBO, VAO;
 
-    loadBuffer(vertices, sizeof(vertices), indices, sizeof(indices), VBO, VAO, EBO);
+    glGenBuffers(1, &VBO);
+    glGenVertexArrays(1, &VAO);
 
-    //-----------------------------------------------------------------------------------------------------------------
+    // Bind VAO first
+    glBindVertexArray(VAO);
 
-    // 3. set up shader
-    Shader theShader("src/shaders/shader.vs", "src/shaders/shader.fs");
+    // buffer binding (bind VBO to GL_ARRAY_BUFFER)
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // allocate the buffer to VRAM
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // specified how OpenGL should interpret the vertex data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
+    
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    
 
     //-----------------------------------------------------------------------------------------------------------------
     // uncomment this call to draw in wireframe polygons.
@@ -66,19 +115,15 @@ int main()
     unsigned int texture1, texture2;
     loadTexture(texture1, texture2);
 
+    // activate shader program
+    theShader.use();
+    theShader.setInt("texture1", 0);
+    theShader.setInt("texture2", 1);
     //-----------------------------------------------------------------------------------------------------------------
 
     // 5. render loop
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    glm::mat4 view = glm::mat4(1.0f);
-    // note that we're translating the scene in the reverse direction of where we want to move
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+    
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -86,7 +131,7 @@ int main()
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -94,26 +139,29 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        
-        glUniform1i(glGetUniformLocation(theShader.ID, "texture1"), 0);
-        glUniform1i(glGetUniformLocation(theShader.ID, "texture2"), 1);
-        
-        int modelLoc = glGetUniformLocation(theShader.ID, "model");
-        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-        // view
-        int viewLoc = glGetUniformLocation(theShader.ID, "view");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-        // projection
-        int projLoc = glGetUniformLocation(theShader.ID, "projection");
-        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-        // activate shader program
         theShader.use();
 
+        // create transformations
+        glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+        glm::mat4 view          = glm::mat4(1.0f);
+        glm::mat4 projection    = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.5f, 1.0f, 0.0f));
+        view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
+        unsigned int modelLoc = glGetUniformLocation(theShader.ID, "model");
+        unsigned int viewLoc  = glGetUniformLocation(theShader.ID, "view");
+        unsigned int projLoc = glGetUniformLocation(theShader.ID, "projection");
+        
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        glUniform1i(glGetUniformLocation(theShader.ID, "texture1"), 0);
+        glUniform1i(glGetUniformLocation(theShader.ID, "texture2"), 1);
+
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -123,7 +171,6 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
 
     // clear all allocated resource
     glfwTerminate();
@@ -143,7 +190,7 @@ GLFWwindow *glfwWindowSetup()
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // this is required for mac
 
     // ***!!!create window object!!!***
-    GLFWwindow *window = glfwCreateWindow(800, 600, "Begin_OpenGl", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Begin_OpenGl", NULL, NULL);
     if (window == NULL)
     {
         glfwTerminate();
@@ -162,42 +209,10 @@ GLFWwindow *glfwWindowSetup()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     //turn on later
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     return window;
 }
 
-// 2. รกชิบหาย
-void loadBuffer(const float vertices[], size_t vertices_size, const unsigned int indices[], size_t indices_size, unsigned int &VBO, unsigned int &VAO, unsigned int &EBO)
-{
-    glGenBuffers(1, &VBO);
-    glGenVertexArrays(1, &VAO);
-
-    // Bind VAO first
-    glBindVertexArray(VAO);
-
-    // buffer binding (bind VBO to GL_ARRAY_BUFFER)
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    // allocate the buffer to VRAM
-    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
-
-    // specified how OpenGL should interpret the vertex data
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-
-    // specify color attribute vertex array pointer
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    //  create element buffer object for specifying the order of drawing multiple triangle
-    glGenBuffers(1, &EBO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-};
 
 // 3.
 void loadTexture(unsigned int &texture1, unsigned int &texture2)
@@ -215,6 +230,7 @@ void loadTexture(unsigned int &texture1, unsigned int &texture2)
 
     // import the image data
     int containerWidth, containerHeight, nrChannels;
+    
     unsigned char *data = stbi_load("textures/container.jpg", &containerWidth, &containerHeight, &nrChannels, 0);
     if (data)
     {
@@ -228,7 +244,7 @@ void loadTexture(unsigned int &texture1, unsigned int &texture2)
     }
     stbi_image_free(data);
 
-    // for smiley
+    // texture 2 (for smiley)
 
     glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
@@ -241,7 +257,7 @@ void loadTexture(unsigned int &texture1, unsigned int &texture2)
 
     // import the image data
     stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("textures/awesomeface.png", &containerWidth, &containerHeight, &nrChannels, 0);
+    data = stbi_load("textures/awesomeface.png", &containerWidth, &containerHeight, &nrChannels, STBI_rgb_alpha);
     if (data)
     {
         // generate texture

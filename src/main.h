@@ -10,9 +10,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 GLFWwindow* glfwWindowSetup();
-void loadBuffer(const float[], size_t,
-                const unsigned int[], size_t, 
-                unsigned int&, unsigned int&, unsigned int&);
+// void loadBuffer(const float[], size_t,
+//                 const unsigned int[], size_t, 
+//                 unsigned int&, unsigned int&, unsigned int&);
 
 void loadTexture(unsigned int&,unsigned int&);
 
