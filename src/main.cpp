@@ -94,14 +94,12 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        // activate shader program
-        theShader.use();
+        
         glUniform1i(glGetUniformLocation(theShader.ID, "texture1"), 0);
         glUniform1i(glGetUniformLocation(theShader.ID, "texture2"), 1);
+        
         int modelLoc = glGetUniformLocation(theShader.ID, "model");
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-        theShader.use();
 
         // view
         int viewLoc = glGetUniformLocation(theShader.ID, "view");
@@ -110,6 +108,9 @@ int main()
         // projection
         int projLoc = glGetUniformLocation(theShader.ID, "projection");
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+        // activate shader program
+        theShader.use();
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -160,10 +161,12 @@ GLFWwindow *glfwWindowSetup()
     // this function call use the resize callback fucntion to readjust the viewport to fit the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    //turn on later
+    //glEnable(GL_DEPTH_TEST);
     return window;
 }
 
-// 2.
+// 2. รกชิบหาย
 void loadBuffer(const float vertices[], size_t vertices_size, const unsigned int indices[], size_t indices_size, unsigned int &VBO, unsigned int &VAO, unsigned int &EBO)
 {
     glGenBuffers(1, &VBO);
