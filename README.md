@@ -1,5 +1,11 @@
 This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ development lol)
 
+## To build you can use 
+
+- cmake --build ./build/
+then
+- ./build/Begin_OpenGL 
+
 ## Goal 
 dude let's remake my cg project
 

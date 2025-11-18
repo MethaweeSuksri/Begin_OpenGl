@@ -17,4 +17,4 @@ GLFWwindow* glfwWindowSetup();
 void loadTexture(unsigned int&,unsigned int&);
 
 void framebuffer_size_callback(GLFWwindow *, int , int );
-void processInput(GLFWwindow *window);
+void processInput(GLFWwindow *window, glm::vec3&, glm::vec3&, glm::vec3&);
