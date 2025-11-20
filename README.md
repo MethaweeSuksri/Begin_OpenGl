@@ -1,5 +1,7 @@
 This is for me to learn C++, OpenGl and Cmake (so basically everthing about c++ development lol)
 
+to build this projecy you'll need Cmake
+
 ## To build you can use 
 
 - cmake --build ./build/
