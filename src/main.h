@@ -8,13 +8,17 @@
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "camera.h"
 
 GLFWwindow* glfwWindowSetup();
-void loadBuffer(const float[], size_t,
-                const unsigned int[], size_t, 
-                unsigned int&, unsigned int&, unsigned int&);
+// void loadBuffer(const float[], size_t,
+//                 const unsigned int[], size_t, 
+//                 unsigned int&, unsigned int&, unsigned int&);
 
 void loadTexture(unsigned int&,unsigned int&);
 
 void framebuffer_size_callback(GLFWwindow *, int , int );
+void processInput(GLFWwindow *window, glm::vec3&, glm::vec3&, glm::vec3&);
 void processInput(GLFWwindow *window);
+void mouse_callback(GLFWwindow* , double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);

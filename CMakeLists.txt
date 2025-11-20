@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(SOURCES
     src/main.cpp
     src/shader.cpp
+    src/camera.h
     src/glad.c
     src/stb_image.cpp
 )
