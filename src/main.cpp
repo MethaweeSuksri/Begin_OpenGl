@@ -1,7 +1,18 @@
 #include "main.h"
 
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
+
+float deltaTime = 0.0f;	// time between current frame and last frame
+float lastFrame = 0.0f;
 
 
+// camera
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
+bool firstMouse = true;
 
 /*
     1. set up window
@@ -15,66 +26,146 @@ int main()
 {
 
     // 1. Set up window
-    GLFWwindow*  window;
+    GLFWwindow *window;
     try
     {
-        window = glfwWindowSetup();    
-    }catch(const std::runtime_error& e){
-        std::cerr << "Error : " << e.what() <<"\n";
+        window = glfwWindowSetup();
+    }
+    catch (const std::runtime_error &e)
+    {
+        std::cerr << "Error : " << e.what() << "\n";
     }
 
     //-----------------------------------------------------------------------------------------------------------------
-    
-    // 2. vertex preparation
 
-    //  define vertices 
-    constexpr float vertices[] = {
-    // positions          // colors           // texture coords
-     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
-     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
-};
-
-    //EBO
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 2,   // first triangle
-        0, 2, 3,   // first triangle
-    }; 
-
-    // Buffer generation, vertex array generation
-    unsigned int VBO,VAO, EBO;
-    
-    loadBuffer( vertices,sizeof(vertices), indices, sizeof(indices), VBO, VAO, EBO);
-
+    Shader theShader("src/shaders/shader.vs", "src/shaders/shader.fs");
 
     //-----------------------------------------------------------------------------------------------------------------
+
+    // 2. vertex preparation
+
+    //  define vertices
+    constexpr float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    };
+
+    constexpr glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f), 
+    glm::vec3( 2.0f,  5.0f, -15.0f), 
+    glm::vec3(-1.5f, -2.2f, -2.5f),  
+    glm::vec3(-3.8f, -2.0f, -12.3f),  
+    glm::vec3( 2.4f, -0.4f, -3.5f),  
+    glm::vec3(-1.7f,  3.0f, -7.5f),  
+    glm::vec3( 1.3f, -2.0f, -2.5f),  
+    glm::vec3( 1.5f,  2.0f, -2.5f), 
+    glm::vec3( 1.5f,  0.2f, -1.5f), 
+    glm::vec3(-1.3f,  1.0f, -1.5f)  
+};
+
+
+    // Buffer generation, vertex array generation
+    unsigned int VBO, VAO;
+
+    glGenBuffers(1, &VBO);
+    glGenVertexArrays(1, &VAO);
+
+    // Bind VAO first
+    glBindVertexArray(VAO);
+
+    // buffer binding (bind VBO to GL_ARRAY_BUFFER)
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
+    // allocate the buffer to VRAM
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // specified how OpenGL should interpret the vertex data
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)0);
+    glEnableVertexAttribArray(0);
+
     
-    // 3. set up shader    
-    Shader theShader("src/shaders/shader.vs","src/shaders/shader.fs");
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
     
 
     //-----------------------------------------------------------------------------------------------------------------
     // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
     // 4. import texture
 
-    //create and bind gl texture
+    // create and bind gl texture
     unsigned int texture1, texture2;
-    loadTexture(texture1,texture2);
-    
+    loadTexture(texture1, texture2);
+
+    // activate shader program
+    theShader.use();
+    theShader.setInt("texture1", 0);
+    theShader.setInt("texture2", 1);
     //-----------------------------------------------------------------------------------------------------------------
-    
+
     // 5. render loop
+
+    // create transformations
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+    glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // render loop
     while (!glfwWindowShouldClose(window))
     {
+
+        float currentFrame = static_cast<float>(glfwGetTime());
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         processInput(window);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -82,26 +173,37 @@ int main()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        
-glm::mat4 trans = glm::mat4(1.0f);
-trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-
-
-        //activate shader program
         theShader.use();
 
+        
 
-        unsigned int transformLoc = glGetUniformLocation(theShader.ID, "transform");
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        // pass projection matrix to shader (note that in this case it could change every frame)
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        theShader.setMat4("projection", projection);
+
+        // camera/view transformation
+        glm::mat4 view = camera.GetViewMatrix();
+        theShader.setMat4("view", view);
+        
+
+
         glUniform1i(glGetUniformLocation(theShader.ID, "texture1"), 0);
         glUniform1i(glGetUniformLocation(theShader.ID, "texture2"), 1);
-        
+
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
-        
-        
+        //multi model matrix loop
+        for (unsigned int i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f) * i, glm::vec3(0.5f, 1.0f, 0.0f));
+            theShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+        glDrawArrays(GL_TRIANGLES, 0, 36);
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -110,19 +212,15 @@ trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
 
-    
-    
     // clear all allocated resource
     glfwTerminate();
 
     return 0;
 }
 
-
 // 1. Set up window
-GLFWwindow*  glfwWindowSetup()
+GLFWwindow *glfwWindowSetup()
 {
 
     // initialize glfw
@@ -131,11 +229,10 @@ GLFWwindow*  glfwWindowSetup()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // this is required for mac
-
     
 
     // ***!!!create window object!!!***
-    GLFWwindow *window = glfwCreateWindow(800, 600, "Begin_OpenGl", NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Begin_OpenGl", NULL, NULL);
     if (window == NULL)
     {
         glfwTerminate();
@@ -152,65 +249,37 @@ GLFWwindow*  glfwWindowSetup()
 
     // this function call use the resize callback fucntion to readjust the viewport to fit the window
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
+    //turn on later
+    glEnable(GL_DEPTH_TEST);
+    
     return window;
 }
 
-// 2.
-void loadBuffer( const float vertices[], size_t vertices_size , const unsigned int indices[], size_t indices_size , unsigned int& VBO, unsigned int& VAO, unsigned int& EBO)
-{
-    glGenBuffers(1, &VBO);
-    glGenVertexArrays(1,&VAO);
-
-    // Bind VAO first
-    glBindVertexArray(VAO);
-
-    // buffer binding (bind VBO to GL_ARRAY_BUFFER)
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
-    // allocate the buffer to VRAM
-    glBufferData(GL_ARRAY_BUFFER, vertices_size, vertices, GL_STATIC_DRAW);
-
-    // specified how OpenGL should interpret the vertex data 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);  
-
-    // specify color attribute vertex array pointer
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);  
-
-
-    //  create element buffer object for specifying the order of drawing multiple triangle
-    glGenBuffers(1, &EBO);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW); 
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-glEnableVertexAttribArray(2);
-
-};
 
 // 3.
-void loadTexture(unsigned int& texture1,unsigned int& texture2)
+void loadTexture(unsigned int &texture1, unsigned int &texture2)
 {
 
-    //for barrel
-    glGenTextures(1, &texture1); 
+    // for barrel
+    glGenTextures(1, &texture1);
     glBindTexture(GL_TEXTURE_2D, texture1);
-     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    //import the image data
+    // import the image data
     int containerWidth, containerHeight, nrChannels;
-    unsigned char *data = stbi_load("textures/container.jpg", &containerWidth, &containerHeight, &nrChannels, 0); 
-    if(data)
+    
+    unsigned char *data = stbi_load("textures/container.jpg", &containerWidth, &containerHeight, &nrChannels, 0);
+    if (data)
     {
-        //generate texture
+        // generate texture
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, containerWidth, containerHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
@@ -220,23 +289,23 @@ void loadTexture(unsigned int& texture1,unsigned int& texture2)
     }
     stbi_image_free(data);
 
-    // for smiley
+    // texture 2 (for smiley)
 
-    glGenTextures(1, &texture2); 
+    glGenTextures(1, &texture2);
     glBindTexture(GL_TEXTURE_2D, texture2);
-     // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // set texture wrapping to GL_REPEAT (default wrapping method)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    
-    //import the image data
+
+    // import the image data
     stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("textures/awesomeface.png", &containerWidth, &containerHeight, &nrChannels, 0);
-    if(data)
+    data = stbi_load("textures/awesomeface.png", &containerWidth, &containerHeight, &nrChannels, STBI_rgb_alpha);
+    if (data)
     {
-        //generate texture
+        // generate texture
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, containerWidth, containerHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
@@ -244,10 +313,8 @@ void loadTexture(unsigned int& texture1,unsigned int& texture2)
     {
         std::cout << "Failed to load texture\n";
     }
-    
 
-
-    //we're done generating the texture so we'll delete the data (unsign char "container") 
+    // we're done generating the texture so we'll delete the data (unsign char "container")
     stbi_image_free(data);
 }
 
@@ -261,4 +328,43 @@ void processInput(GLFWwindow *window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.ProcessKeyboard(FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.ProcessKeyboard(LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+// glfw: whenever the mouse moves, this callback is called
+// -------------------------------------------------------
+void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
+{
+    float xpos = static_cast<float>(xposIn);
+    float ypos = static_cast<float>(yposIn);
+
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+    lastX = xpos;
+    lastY = ypos;
+
+    camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera.ProcessMouseScroll(static_cast<float>(yoffset));
 }
